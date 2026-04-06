@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/index.ts",
+    "dev": "bun --hot index.ts",
     "start": "bun dist/index.js",
-    "build": "bun build ./src/index.ts --outfile dist/index.js --target bun --minify",
-    "auth:generate": "bunx @better-auth/cli generate --config ./src/lib/auth.ts",
+    "build": "bun build ./index.ts --outfile dist/index.js --target bun --minify",
+    "auth:generate": "bunx @better-auth/cli generate --config ./lib/auth.ts",
     "db:generate": "bunx drizzle-kit generate",
     "db:migrate": "bunx drizzle-kit migrate"
   },
@@ -16,7 +16,6 @@
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.5.6",
     "argon2": "^0.44.0",
-    "bcrypt-ts": "^8.0.1",
     "better-auth": "^1.5.6",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.9",

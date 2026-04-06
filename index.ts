@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import createAuth from "./lib/auth";
+import createAuth from "./src/lib/auth.js";
 import { secureHeaders } from "hono/secure-headers";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { csrf } from "hono/csrf";
-import emailRoute from "./lib/nodeMailer";
+import emailRoute from "./src/lib/nodeMailer.js";
 
 const app = new Hono();
 
