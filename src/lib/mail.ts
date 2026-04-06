@@ -18,6 +18,7 @@ function createTransporter() {
   return nodemailer.createTransport({
     service: "Gmail",
     auth: { user, pass },
+    secure: true, // REQUIRED for 465
   });
 }
 
