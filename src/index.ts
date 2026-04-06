@@ -71,5 +71,4 @@ app.get("/", (c) => c.json({ status: "ok from auth server" }));
 
 export default {
   port: PORT,
-  fetch: app.fetch,
 };
