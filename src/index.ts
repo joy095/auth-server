@@ -47,7 +47,7 @@ app.route("/", emailRoute);
 
 app.all("/api/auth/**", async (c) => {
   try {
-    const auth = createAuth(process.env);
+    const auth = createAuth();
     const res = await auth.handler(c.req.raw);
 
     if (res) return res;

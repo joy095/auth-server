@@ -401,7 +401,7 @@ const db = createDb();
 
 // ─── Auth factory ─────────────────────────────────────────────────────────────
 
-export default function createAuth(env: NodeJS.ProcessEnv) {
+export default function createAuth() {
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
@@ -416,8 +416,8 @@ export default function createAuth(env: NodeJS.ProcessEnv) {
 
     socialProviders: {
       google: {
-        clientId: env.APP_GOOGLE_ID!,
-        clientSecret: env.APP_GOOGLE_SECRET!,
+        clientId: process.env.APP_GOOGLE_ID!,
+        clientSecret: process.env.APP_GOOGLE_SECRET!,
       },
     },
 
@@ -532,14 +532,14 @@ export default function createAuth(env: NodeJS.ProcessEnv) {
             html: generatePremiumInvitationEmail({
               inviterName: inviter.user.name,
               orgName: organization.name,
-              invitationUrl: `${env.APP_BASE_URL}/accept-invitation?token=${invitation.id}`,
+              invitationUrl: `${process.env.APP_BASE_URL}/accept-invitation?token=${invitation.id}`,
             }),
           });
         },
       }),
     ],
 
-    trustedOrigins: (env.ALLOWED_ORIGINS ?? "http://localhost:5173")
+    trustedOrigins: (process.env.ALLOWED_ORIGINS ?? "http://localhost:5173")
       .split(",")
       .map((o) => o.trim()),
 
