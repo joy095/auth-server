@@ -8,7 +8,6 @@ import emailRoute from "./lib/nodeMailer";
 
 const app = new Hono();
 
-const PORT = process.env.PORT || 5000;
 const isDev = process.env.NODE_ENV === "development";
 
 const getOrigins = () => {
@@ -69,6 +68,4 @@ app.all("/api/auth/**", async (c) => {
 
 app.get("/", (c) => c.json({ status: "ok from auth server" }));
 
-export default {
-  port: PORT,
-};
+export default app;
