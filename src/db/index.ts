@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as authSchema from "./schema/auth-schema";
+import * as authSchema from "./schema/auth-schema.js";
 
 declare global {
   // allow global reuse in dev / serverless
