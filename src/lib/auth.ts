@@ -11,9 +11,9 @@ import {
 } from "better-auth/plugins";
 import * as argon2 from "argon2";
 
-import * as authSchema from "../db/schema/auth-schema";
-import { sendEmail } from "./mail";
-import { createDb } from "../db";
+import * as authSchema from "../db/schema/auth-schema.js";
+import { sendEmail } from "./mail.js";
+import { createDb } from "../db/index.js";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 
 /**
