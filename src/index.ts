@@ -4,7 +4,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { csrf } from "hono/csrf";
-import emailRoute from "./lib/nodeMailer.js";
+import emailRoute from "./lib/nodeMailer";
 
 const app = new Hono();
 
