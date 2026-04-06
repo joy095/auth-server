@@ -20,6 +20,8 @@ function createTransporter() {
     port: 587,
     secure: false, // REQUIRED for secure 465 || secure false 587
     auth: { user, pass },
+    logger: true,
+    debug: true,
   });
 }
 
