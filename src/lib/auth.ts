@@ -15,7 +15,6 @@ import * as authSchema from "../db/schema/auth-schema.js";
 import { sendEmail } from "./mail.js";
 import { createDb } from "../db/index.js";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-
 /**
  * ============================================================================
  * PREMIUM EMAIL TEMPLATES
@@ -416,8 +415,8 @@ export default function createAuth() {
 
     socialProviders: {
       google: {
-        clientId: process.env.APP_GOOGLE_ID!,
-        clientSecret: process.env.APP_GOOGLE_SECRET!,
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       },
     },
 

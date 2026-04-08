@@ -66,7 +66,6 @@ async function dispatch(options: EmailOptions): Promise<void> {
   }
 }
 
-
 // In better-auth callbacks (sendVerificationOTP, sendInvitationEmail) there is
 // no executionCtx available — omit it and the send runs as best-effort.
 // Those callbacks are already async so the runtime won't freeze waiting on them.
