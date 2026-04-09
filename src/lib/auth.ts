@@ -14,7 +14,7 @@ import * as argon2 from "argon2";
 import * as authSchema from "../db/schema/auth-schema.js";
 import { sendEmail } from "./mail.js";
 import { createDb } from "../db/index.js";
-import { APIError, createAuthMiddleware } from "better-auth/api";
+import { APIError } from "better-auth/api";
 /**
  * ============================================================================
  * PREMIUM EMAIL TEMPLATES
@@ -441,61 +441,21 @@ export default function createAuth() {
       },
     },
 
-    hooks: {
-      before: createAuthMiddleware(async (ctx) => {
-        if (ctx.path !== "/sign-up/email") return;
-
-        const email = ctx.body?.email;
-        if (!email)
-          throw new APIError("BAD_REQUEST", { message: "Email is required" });
-
-        const existingUser =
-          await ctx.context.internalAdapter.findUserByEmail(email);
-
-        if (existingUser) {
-          if (existingUser.user.emailVerified) {
-            throw new APIError("CONFLICT", {
-              message: "This email is already in use. Try logging in instead.",
-            });
-          }
-
-          const otp = await ctx.context.internalAdapter.createVerificationValue(
-            {
-              identifier: existingUser.user.email,
-              value: Math.floor(100000 + Math.random() * 900000).toString(),
-              expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-            },
-          );
-
-          await sendOtpEmail(
-            existingUser.user.email,
-            otp.value,
-            "email-verification",
-          );
-
-          throw new APIError("ACCEPTED", {
-            message:
-              "Email already registered. A new verification link has been sent to your inbox.",
-          });
-        }
-      }),
-    },
-
     emailVerification: {
       sendVerificationEmail: async () => {},
       sendOnSignIn: true,
     },
 
     plugins: [
-      bearer(),
-      openAPI(),
+      bearer({}),
+      ...(process.env.NODE_ENV === "development" ? [openAPI({})] : []),
       admin(),
 
       jwt({
         jwks: {
-          keyPairConfig: { alg: "EdDSA" },
+          keyPairConfig: { alg: "EdDSA" }, // "EdDSA" | "ES256" | "ES512" | "PS256" | "RS256"
           rotationInterval: 60 * 60 * 24 * 30,
-          gracePeriod: 60 * 60 * 24 * 30,
+          gracePeriod: 60 * 60 * 24 * 20,
         },
         jwt: {
           expirationTime: "15m",
@@ -503,15 +463,15 @@ export default function createAuth() {
       }),
 
       emailOTP({
-        otpLength: 6,
-        expiresIn: 300,
-
         // This is the single canonical place better-auth calls to deliver
         // every OTP — sign-in, email-verification, and forget-password.
         // Direct function call, no HTTP.
         async sendVerificationOTP({ email, otp, type }) {
           await sendOtpEmail(email, otp, type);
         },
+        otpLength: 6,
+        expiresIn: 300, // 5 minutes
+        sendVerificationOnSignUp: true,
       }),
 
       organization({
