@@ -500,6 +500,10 @@ export default function createAuth() {
 
     session: {
       deferSessionRefresh: true,
+      cookieCache: {
+        enabled: true, // Reduce DB hits
+        maxAge: 5 * 60, // 5 minutes
+      },
     },
 
     trustedOrigins: (process.env.ALLOWED_ORIGINS ?? "http://localhost:5173")
