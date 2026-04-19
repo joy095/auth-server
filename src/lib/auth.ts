@@ -498,6 +498,10 @@ export default function createAuth() {
       }),
     ],
 
+    session: {
+      deferSessionRefresh: true,
+    },
+
     trustedOrigins: (process.env.ALLOWED_ORIGINS ?? "http://localhost:5173")
       .split(",")
       .map((o) => o.trim()),
