@@ -1,11 +1,25 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import createAuth from "./lib/auth.js";
 import { secureHeaders } from "hono/secure-headers";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { csrf } from "hono/csrf";
 
-const app = new Hono();
+type Bindings = {
+  PORT?: string;
+  NODE_ENV: string;
+  APP_BASE_URL: string;
+  MAIL_FROM: string;
+  DATABASE_URL: string;
+  MAIL_HMAC_SECRET: string;
+  EMAIL_SERVER_URL: string;
+  ALLOWED_ORIGINS: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  BETTER_AUTH_SECRET: string;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -30,6 +44,7 @@ app.use(
     credentials: true,
     allowHeaders: ["Content-Type", "Authorization", "x-signature"],
     allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    exposeHeaders: ["Set-Cookie"], // Allow browser to read Set-Cookie
   }),
 );
 
@@ -42,7 +57,7 @@ app.use(
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-app.all("/api/auth/**", async (c) => {
+app.all("/api/auth/**", async (c: Context) => {
   try {
     const auth = createAuth();
     const res = await auth.handler(c.req.raw);
@@ -63,6 +78,17 @@ app.all("/api/auth/**", async (c) => {
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 
-app.get("/", (c) => c.json({ status: "ok from auth server" }));
+app.get("/", (c) => {
+  return c.json({
+    success: true,
+    message: "Ok from auth Server",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+  });
+});
 
-export default app;
+export default {
+  port: process.env.PORT || 5000,
+  fetch: app.fetch,
+  hostname: process.env.HOSTNAME || "localhost",
+};
