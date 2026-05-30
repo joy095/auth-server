@@ -9,6 +9,8 @@ import {
   multiSession,
   openAPI,
   organization,
+  phoneNumber,
+  twoFactor,
 } from "better-auth/plugins";
 import * as argon2 from "argon2";
 
@@ -19,7 +21,10 @@ import { APIError } from "better-auth/api";
 import {
   generatePremiumInvitationEmail,
   generatePremiumOtpEmail,
+  generatePremiumResetPasswordEmail,
 } from "../utils/emailTemplate.js";
+import { generatePremiumSmsOtp } from "../utils/smsTemplate.js";
+import { sendSMS } from "./sms.js";
 
 // ─── Shared OTP email sender ──────────────────────────────────────────────────
 // Extracted so both the hook and emailVerification can call it directly
@@ -88,6 +93,19 @@ export default function createAuth() {
       minPasswordLength: 8,
       maxPasswordLength: 128,
 
+      async sendResetPassword({ user, url, token }) {
+        sendEmail({
+          to: user.email,
+          subject: "Reset your password",
+          text: `Reset your password: ${url}\n\nIf you didn't request this, you can safely ignore this email.`,
+          html: generatePremiumResetPasswordEmail({
+            userName: user.name,
+            userEmail: user.email,
+            resetUrl: url,
+            token: token,
+          }),
+        });
+      },
       onSignIn: async ({ user }: { user: User }) => {
         if (!user.emailVerified) {
           throw new APIError("UNAUTHORIZED", {
@@ -106,6 +124,7 @@ export default function createAuth() {
     emailVerification: {
       sendVerificationEmail: async () => {},
       sendOnSignIn: true,
+      autoSignInAfterVerification: true,
     },
 
     session: {
@@ -136,6 +155,29 @@ export default function createAuth() {
       admin(),
       multiSession({
         maximumSessions: 1,
+      }),
+
+      twoFactor({
+        allowPasswordless: true,
+      }),
+
+      phoneNumber({
+        sendOTP: async ({ phoneNumber, code }) => {
+          const message = generatePremiumSmsOtp({
+            code,
+            brand: "Timezly",
+            action: "verification",
+            expiryMinutes: 5,
+          });
+
+          await sendSMS(phoneNumber, message);
+
+          console.log(`SMS sent to ${phoneNumber}`);
+        },
+
+        // verifyOTP(data, ctx) {
+
+        // },
       }),
 
       jwt({
