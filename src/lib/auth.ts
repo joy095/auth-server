@@ -159,6 +159,9 @@ export default function createAuth() {
 
       twoFactor({
         allowPasswordless: true,
+        backupCodeOptions: {
+          storeBackupCodes: "encrypted", 
+        },
       }),
 
       phoneNumber({
